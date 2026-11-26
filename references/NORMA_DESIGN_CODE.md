@@ -2810,6 +2810,11 @@ tbody .us{border-top-color:var(--line-inv)}
 - **Плита под hero и подписи блоков - факты, не слоганы** (14.5).
 - **Один смысл на строке.** Число с единицей («$10 000+», «24/7», «10 лет») не рвать переносом: неразрывный пробел `&nbsp;` или `white-space:nowrap`. Выделенная мысль начинается с новой строки, а не висит хвостом.
 - **Заголовок раздела = пункт меню.** Короткое слово («Концепт», «Лавки», «Партнёры», «Модель», «Смета», «Запуск»), подпись под ним не длиннее двух строк на всю ширину контейнера: `.sub{max-width:none}`.
+- **Подпись под заголовком: первая фраза жирная, дальше тонкий текст** (Макс, 26.11.2026). Сразу под `h2.sec` читатель видит главный факт тёмным (`.sub b{color:var(--ink);font-weight:700}`), пояснение идёт после него цветом `--ink2`. Обратный порядок, когда тонкий текст стоит первым, а жирный хвост в конце, запрещён.
+
+```html
+<p class="sub"><b>Четыре слоя на одном участке: лавки партнёров, наши бренды, фрукты и ярмарка.</b> С лавок партнёров берём 50% чистой прибыли.</p>
+```
 - **Предупреждения только по факту.** Текст-предупреждение показывается, когда условие сработало (порог превышен), а не висит постоянно. Пустые инструкции «как пользоваться» и тексты-пояснения к очевидному удалять.
 - **Риски - один короткий блок в конце страницы**, 4-5 строк по одной мысли, без драмы. По странице риски не разбрасывать.
 - Перевод по смыслу, не калькой: блок примеров = «Proof of Concept», а не «Examples»; концепт = «Our Concept».
@@ -2942,6 +2947,44 @@ if(l){d.classList.add('lang-set');if(l!==d.lang)location.replace((l==='en'?'/pag
 
 - **Модель честная.** Есть разгон после открытия (поток в месяцы 1-3 и 4-6), подушка на разгон в смете, возврат считается по накопленной прибыли месяц за месяцем. Прибыль подписана «на полном потоке». Числа на странице берутся из скрипта, в разметке их не хардкодить.
 - Одни и те же числа совпадают во всех местах страницы.
+- **Смета понятна без автора** (Макс, 26.11.2026). Внутренние ярлыки («Модули», «Площадка», «Site», «Module delivery») не используются: группа называется тем, что в неё входит («Контейнеры и бус», «Участок и мебель»). Итог раскладывается формулой прямо в подписи: «Total = вложения + Safety fund + подушка на разгон», а карточки под итогом показывают эти же слагаемые и окупаемость. Строки по нулям («0 × $800 = $0», «уже стоит, $0») в таблицу и полосы не выводятся.
+- **Пояснение (i).** Термин или итог, которому нужна расшифровка, получает кружок 18px рядом с подписью. По клику (и по наведению мышью) открывается тёмная плашка с составом, одна за раз; клик мимо и Esc закрывают. Кружок склеен с последним словом подписи, чтобы не уезжать на отдельную строку.
+
+```css
+.has-tip{position:relative}
+.has-tip.tip-open{z-index:31}
+.info{position:relative;display:inline-grid;place-items:center;width:18px;height:18px;margin-left:6px;padding:0;
+  border:1px solid var(--line);border-radius:999px;corner-shape:round;background:#fff;color:var(--ink2);
+  font:600 11px/1 var(--sf);font-style:normal;text-transform:none;vertical-align:2px;cursor:pointer}
+.info::after{content:'';position:absolute;inset:-12px}          /* цель нажатия 42px */
+.info:hover,.has-tip.tip-open .info{background:var(--dark);border-color:var(--dark);color:#fff}
+.tip{display:none;position:absolute;z-index:30;left:12px;right:12px;top:calc(100% - 8px);padding:12px 14px;
+  border-radius:var(--r-sm);background:var(--dark);color:#fff;font-size:13px;font-weight:400;line-height:1.45;text-transform:none}
+.has-tip.tip-open .tip{display:block}
+@media(hover:hover){.has-tip:has(.info:hover) .tip{display:block}}
+.nw{white-space:nowrap}
+/* узкие KPI (4 в ряд в половине калькулятора): подсказка не уже 230px, у правых колонок прижата вправо */
+.kpis .tip{right:auto;width:max(calc(100% - 24px),230px)}
+.kpis>.kpi:nth-child(4n+3) .tip,.kpis>.kpi:nth-child(4n+4) .tip{left:auto;right:12px}
+@media(max-width:1279px){.kpis>.kpi:nth-child(n) .tip{left:12px;right:auto}.kpis>.kpi:nth-child(even) .tip{left:auto;right:12px}}
+@media(max-width:420px){.kpis>.kpi:nth-child(n) .tip{left:12px;right:12px;width:auto}}
+```
+
+Пояснение нужно и в модели прибыли: оборот (это деньги гостей, а не прибыль), маржа, точка безубыточности, окупаемость. Строка под прибылью раскладывает её формулой с суммами: «Прибыль = наши бренды $X + доля с партнёров $Y + ярмарки $Z − общие расходы $W − налоги $T». Подписи ползунков называют то, что двигается («Гостей в месяцы 1-3», а не «Поток в месяцы 1-3»).
+
+```html
+<div class="kpi has-tip"><span class="k">Подушка на <span class="nw">разгон<button class="info" type="button" aria-expanded="false" aria-label="Пояснение">i</button></span></span>
+  <span class="v">$7 000</span><span class="tip" role="tooltip">Около месяца расходов сада и штата брендов, пока гостей мало.</span></div>
+```
+
+```js
+document.addEventListener('click', function(e){
+  var b = e.target.closest('.info'), h = b && b.closest('.has-tip');
+  document.querySelectorAll('.has-tip.tip-open').forEach(function(x){ if (x !== h){ x.classList.remove('tip-open'); x.querySelector('.info').setAttribute('aria-expanded','false'); } });
+  if (h) b.setAttribute('aria-expanded', String(h.classList.toggle('tip-open')));
+});
+document.addEventListener('keydown', function(e){ if (e.key === 'Escape') document.querySelectorAll('.tip-open').forEach(function(x){ x.classList.remove('tip-open'); }); });
+```
 
 ## 14.9. Превью ссылки (OG)
 
@@ -2968,6 +3011,15 @@ if(l){d.classList.add('lang-set');if(l!==d.lang)location.replace((l==='en'?'/pag
 
 `.pil-sub` обрезается в четырёх узких колонках на 1001-1100px: высоту подписи не фиксировать, строки карточек выравнивает subgrid (13.8).
 
+Найдено 26.11.2026 на смете Butterfly Garden:
+
+```css
+/* калькулятор на телефоне: колонка 1fr растягивается до min-width таблицы (780px), весь блок вылезает за экран */
+@media(max-width:1020px){.calc{grid-template-columns:minmax(0,1fr)}}
+/* .bar-top span красит серым любой вложенный span, в том числе внутри подписи b */
+.bar-top b .nw{color:inherit;font:inherit;letter-spacing:inherit}
+```
+
 ## 14.11. NORMA в приложениях (по CrewHarness)
 
 Для веб-приложений и PWA, не для лендингов:
@@ -2990,3 +3042,5 @@ if(l){d.classList.add('lang-set');if(l!==d.lang)location.replace((l==='en'?'/pag
 6. Фото не повторяются, визуализации подписаны.
 7. Предупреждения появляются только по условию; риски одним блоком в конце.
 8. OG-картинка из текущего hero, имя файла новое после смены.
+9. Подпись под каждым заголовком начинается с жирной фразы, дальше тонкий текст.
+10. В смете нет внутренних ярлыков и строк по нулям; Total разложен формулой; где нужна расшифровка, стоит (i). Калькулятор на 375px не шире экрана.
