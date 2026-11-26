@@ -8,6 +8,8 @@ NORMA - это визуальная система полностраничны�
 
 Всё, что ниже, процитировано из исходника. Где в исходнике чего-то нет, это сказано словами «в исходнике не задано». Внешних CSS-файлов у страницы нет, `@font-face` не задан, `@keyframes` не задан ни разу.
 
+**Обновление 25.11.2026: часть 13 (сверка с живым nor.ma) перекрывает части 1-7 там, где значения расходятся. Начинай чтение с неё.**
+
 Дополнение от 18.09.2026: правило симметрии в части 9 и соответствующие пункты приёмки в части 10 утверждены как переносимый стандарт для следующих сборок. Это нормативное дополнение к разбору исходника; при расхождении в требованиях к симметрии применяется новое правило. Цитаты CSS эталона сохраняют исторические значения.
 
 ---
@@ -2016,6 +2018,7 @@ grep -nP '[\x{2010}-\x{2015}\x{2212}]' /path/to/index.html
 - [ ] Фиксированные высоты с `overflow:hidden` сняты на своём брейкпоинте.
 - [ ] Ни один кегль и ни одно крупное поле не адаптируются лишним медиазапросом там, где достаточно `clamp` (единственное исключение системы - `.hs b{font-size:19px}` на 520px).
 - [ ] Широкий контент лежит в обёртке с `overflow-x:auto` и `min-width` на самой таблице; страница по горизонтали не скроллится.
+- [ ] На компьютере (от 900px) таблица целиком влезает в контейнер без прокрутки: при 6+ колонках кегль и отступы уменьшены по 13.10, за ширину контейнера таблица не выходит.
 
 ### Текст и финальные проверки
 
@@ -2519,3 +2522,471 @@ runnable-track` и `::-moz-range-track`). Формулировка исправ�
 - Приглушённый текст и акценты внутри мобильного меню и внутри `.gal figcaption`: заданы только базовый фон и базовый цвет.
 - `og:image` и `<link rel="canonical">`.
 - Причины выбора конкретных чисел брейкпоинтов: комментариев в исходнике нет, объяснения в 7.2 выведены из самих значений и помечены как вывод, а не как цитата.
+
+
+---
+
+# ЧАСТЬ 13. СВЕРКА С NOR.MA (25.11.2026) - ДЕЙСТВУЮЩИЙ СТАНДАРТ
+
+> Сняты замеры с живого https://nor.ma через `getComputedStyle` и дерево CSS-переменных сайта, на ширинах 1440 и 375. Источник истины по форме и пропорциям теперь nor.ma, а не наша копия moloko.
+> **Эта часть перекрывает части 1-7 везде, где значения расходятся.** Цитаты эталона moloko в частях 1-7 остаются как история.
+> Решения Макса, которые сознательно отличаются от nor.ma, сохранены и помечены «оставляем наше».
+
+## 13.1. Что оставляем нашим (решения Макса, nor.ma не перекрывает)
+
+| Что | nor.ma | NORMA (наше) | Почему |
+|---|---|---|---|
+| Шрифт | Suisse (платный) | **Hanken Grotesk** | замена платного шрифта |
+| Форма угла | обычная дуга | **`corner-shape:superellipse(2.02)`**, у пилюль `round` | решение Макса 20.07.2026 |
+| Радиус полотна (hero, серые и тёмные секции) | `28px`, на мобильном тоже `28px` | **`80px`, на мобильном `40px`** (`--r-lg`) | Макс просил «большой радиус», 28 считал мелким |
+| Пузырьки-теги над заголовками | есть (eyebrow 13px) | **запрещены** | правило с 15.11.2026 |
+| Длинные тире | есть | **запрещены** | правило Макса |
+| Стекло навигации над hero | `rgba(255,255,255,.15)` + `blur(24px)` | **`rgba(255,255,255,.44)` + `blur(12px)`** | Макс: прозрачнее 0.3 пилюли выглядят тёмными |
+| `--ink3` для крупного серого текста | `#a1a1a1` | **`#8a8a8a`** | контраст (часть 12) |
+
+Всё остальное ниже берём с nor.ma.
+
+## 13.2. Токены (дополнение к 1.1)
+
+```css
+:root{
+  /* как у nor.ma */
+  --faint:#e3e3e3;          /* разделители на сером, неактивные точки */
+  --soft2:#ececec;          /* третий серый: hover на #f5f5f5 */
+  --dark2:#1a1a1a;          /* второй тёмный: карточки на тёмном полотне */
+  --line-inv:rgba(255,255,255,0.14); /* граница на тёмном */
+  --ease:cubic-bezier(.22,1,.36,1);  /* единая кривая движения */
+  --ease-ui:cubic-bezier(.4,0,.2,1); /* короткие отклики 150 мс */
+  --container:1040px;       /* ширина контента */
+  /* шкала текста nor.ma */
+  --t-h1:clamp(2rem,1.35rem + 2.8vw,3.5rem);     /* 32 -> 56px */
+  --t-h2:clamp(1.5rem,1.15rem + 1.5vw,2.25rem);  /* 24 -> 36px */
+  --t-h3:clamp(1.125rem,.95rem + .7vw,1.375rem); /* 18 -> 22px */
+  --t-data:clamp(2.5rem,1.7rem + 3.4vw,4rem);    /* 40 -> 64px, крупные числа */
+  --t-body:1rem;            /* 16px */
+  --t-body-lg:1.0625rem;    /* 17px, подзаголовки секций */
+  --t-small:.9375rem;       /* 15px, текст карточек */
+  --t-label:.8125rem;       /* 13px, мелкие подписи */
+}
+```
+
+## 13.3. Типографика (перекрывает 1.3)
+
+Главное отличие от moloko: **заголовки вес 600, а не 800, и в полтора раза мельче.** Крупность у nor.ma создаётся полотном и фото, а не размером букв.
+
+| Роль | Размер | Вес | line-height | letter-spacing | Цвет |
+|---|---|---|---|---|---|
+| h1 (hero) | `var(--t-h1)`, 56px на десктопе | `600` | `1.02` | `-0.03em` | двухтонный: `rgba(255,255,255,.55)` + ключевая часть `#fff` |
+| h2 секции | `var(--t-h2)`, 36px | `600` | `1.1` | `-0.015em` | `var(--ink)`; на тёмном `#fff` |
+| h3 карточки | `var(--t-h3)`, 22px | `600` | `1.5` (в одну строку), `1.375` (в две) | `normal` | `var(--ink)` |
+| подзаголовок секции | `17px` | `400` | `1.5` | - | `var(--ink2)`, `max-width:38-46ch` |
+| текст карточки | `15px` | `400` | `1.45` | - | `var(--ink2)` |
+| текст hero | `17px` | `500` | `1.5` | - | `rgba(255,255,255,.8)`, ключевые слова `#fff`, `max-width:510px` |
+| крупное число (тёмный блок) | `clamp(1.875rem,1.1rem + 2.1vw,2.75rem)`, 44px | `600` | `1` | `-0.04em` | `#fff`, `font-variant-numeric:tabular-nums` |
+| подпись числа | `15px` / `500` + вторая строка `13px` / `400` | | `1.375` | - | `#fff` и `rgba(255,255,255,.6)` |
+| ссылки меню | `14px` | `500` | `1.5` | - | над hero `rgba(255,255,255,.85)`, после прокрутки `var(--ink2)`, hover `var(--ink)` |
+| кнопка основная | `16px` | `600` | - | - | |
+| кнопка малая, чип | `14px` / `13px` | `500` | - | - | |
+| вопрос FAQ | `17px` | `500` | `1.5` | - | `var(--ink)` |
+| шапка таблицы | `16px` | `700` | - | **без uppercase** | `var(--ink)` |
+| строка таблицы (название) | `15px` | `500` | `1.5` | - | `var(--ink)` |
+| заголовок колонки футера | `13px` | `600` | - | - | `var(--ink)` |
+| ссылка футера | `14px` | `400` | - | - | `var(--ink2)`, hover `var(--ink)` |
+
+Капс (uppercase) у nor.ma не используется нигде, кроме кода языка `EN`. Капс-метки 11-12px из частей 1.3 и 4.10 заменяются обычным текстом 13px/500.
+
+## 13.4. Каркас (перекрывает 2.1-2.3)
+
+- **Отступ полотна от края экрана:** `16px`, на мобильном `12px` (было 16 и 8).
+- **Ширина контента:** `max-width:1040px; padding:0 32px`, на мобильном `0 24px`. Полезная ширина 976px. Широкий `.wrap` 1300px оставляем только для полноширинных полотен, текст и сетки живут в 1040.
+- **Полотно-блоки** (hero, серые, тёмные): `max-width:1920px; margin:0 auto`, внутри уже `.wrap`.
+- **Вертикальный ритм:** обычная секция `padding:64px 0` (мобильный `48px`), ключевая секция «как это работает» `128px` (мобильный `96px`).
+- **Шапка секции до сетки:** `margin-top:48-64px` между `h2`+подзаголовком и карточками. Между `h2` и подзаголовком `16-20px`.
+- **Зазоры сеток:** карточки `16-20px`, плитки цифр `12px`, колонки «текст + фото» `16px`.
+
+### Наезд полотен друг на друга (главная находка)
+
+У nor.ma между скруглёнными блоками нет белых щелей: следующий блок **подтягивается вверх на 32px** (`margin-top:-32px`, мобильный `-28px`) и уходит под предыдущий или ложится поверх него. Скругление тогда читается как слой бумаги, а не как вырез.
+
+```css
+/* серая плита под hero: заезжает под низ hero */
+.after-hero{position:relative;z-index:0;margin-top:-32px}
+.after-hero > .canvas{background:var(--soft);border-radius:0 0 var(--r-lg) var(--r-lg);padding:96px 24px 64px}
+.hero{position:relative;z-index:10}
+
+/* серая секция, за которой идёт тёмная: скруглён ВЕРХ, низ уходит под тёмную */
+.gray-top{background:var(--soft);border-radius:var(--r-lg) var(--r-lg) 0 0;padding:80px 0 112px}
+.dark-over{position:relative;z-index:10;margin-top:-32px}
+.dark-over > .canvas{background:var(--dark);border-radius:var(--r-lg)}
+```
+
+Правило 1 части 9 дополняется: серая секция скругляется **с той стороны, где она граничит с белым**. Если снизу тёмный блок, скругляется верх, а тёмный блок наезжает на неё.
+
+## 13.5. Навигация (перекрывает 3.2-3.3)
+
+| Что | nor.ma | Решение |
+|---|---|---|
+| Высота пилюль | `40px` все три | берём |
+| Пилюля-меню | `padding:4px`, ссылки `padding:6px 12px`, `14px/500` | берём |
+| Выравнивание | левый край лого = левый край текста страницы (контейнер 1040) | берём: шапка внутри `.wrap` 1040, без `padding:0 100px` |
+| Стекло над hero | `.15` + `blur(24px)` | оставляем наше `.44` + `blur(12px)` |
+| Состояние `.scrolled` | **белое стекло** `rgba(255,255,255,.8)` + `blur(12px)` + `border:1px solid var(--line)`, ссылки `var(--ink2)` | берём (было тёмное `rgba(10,10,10,.11)` без бордера) |
+| Пилюля языка/валюты + CTA | одна сросшаяся пилюля: переключатель с `padding:0 36px 0 12px`, радиус только слева, CTA наезжает на неё `margin-left:-28px` | берём |
+| CTA в шапке | `height:40px; padding:0 16px; 14px/500`, белая на hero | берём |
+| Мобильная шапка | только лого-пилюля и круглая кнопка меню `40x40` | берём |
+| Переход цвета | `.15s var(--ease-ui)` на `color, background-color, border-color` | берём (было мгновенно) |
+
+## 13.6. Hero (дополняет 4.1)
+
+- Блок-полотно `min-height:84vh`, `overflow:hidden`.
+- Фон в три слоя: запасной градиент `linear-gradient(180deg,#3a3b3d 0%,#6b6c6e 55%,#b9bab9 100%)`, поверх видео или фото `object-fit:cover`, поверх затемнение сверху вниз `linear-gradient(to bottom,rgba(0,0,0,.55),rgba(0,0,0,.25),transparent)`.
+- **Текст стоит сверху**, а не внизу: `padding-top:144px` (мобильный `112px`), внутри `.wrap` 1040.
+- Над h1 стеклянная плашка-факт (это не тег-название блока, а оффер): `13px/500`, `rgba(255,255,255,.15)` + `blur(12px)`, `padding:8px 14px`, пилюля.
+- Две малые кнопки в ряд: основная белая `height:36px`, вторичная `rgba(255,255,255,.1)` + `1px solid rgba(255,255,255,.3)` + `blur(12px)`.
+- Внизу по центру статус-пилюля (`bottom:32px`, мобильный `24px`) с точкой-индикатором: «Новая партия в наличии» и т.п.
+
+## 13.7. Кнопки (перекрывает 5.1)
+
+```css
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;height:48px;padding:0 28px;border-radius:999px;corner-shape:round;font:600 16px/1 var(--sf);transition:background-color .15s var(--ease-ui),transform .15s var(--ease-ui)}
+.btn-dark{background:var(--ink);color:#fff}
+.btn-dark:hover{background:rgba(10,10,10,.9)}
+.btn:active{transform:scale(.99)}
+.btn .arr{transition:transform .15s var(--ease-ui)}
+.btn:hover .arr{transform:translateX(4px)}
+.btn-sm{height:36px;padding:0 16px;font:500 14px/1 var(--sf)}
+.btn-ghost{background:rgba(255,255,255,.8);border:1px solid var(--line);backdrop-filter:blur(12px);color:var(--ink);height:40px;font:500 14px/1 var(--sf)}
+.btn-ghost:hover{border-color:rgba(10,10,10,.2)}
+.chip{background:var(--soft);padding:4px 10px;border-radius:999px;corner-shape:round;font:500 13px/1.5 var(--sf);color:var(--ink)}
+:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(10,10,10,.3)}
+```
+
+Кнопка в карточке ставится на всю ширину карточки (`width:100%`). Стрелка справа от текста, сдвигается на 4px при наведении.
+
+## 13.8. Карточки (перекрывает 4.4)
+
+**Карточка-шаг / столп с фото** (nor.ma «How it works»):
+
+```css
+.card{display:flex;flex-direction:column;overflow:hidden;background:#fff;border:1px solid var(--line);border-radius:36px}
+.card-head{padding:28px}
+.card-no{display:grid;place-items:center;width:28px;height:28px;border-radius:999px;corner-shape:round;border:1px solid var(--line);font:600 13px/1 var(--sf);color:var(--ink2);font-variant-numeric:tabular-nums}
+.card h3{margin-top:16px;font:600 var(--t-h3)/1.5 var(--sf)}
+.card p{margin-top:6px;font-size:15px;line-height:1.45;color:var(--ink2)}
+.card-ph{position:relative;flex:1;min-height:240px;border-top:1px solid var(--line);overflow:hidden}
+.card-ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .6s var(--ease)}
+.card:hover .card-ph img{transform:scale(1.04)}
+```
+
+Радиус карточки `36px`, а не `--r-lg`: 80px на карточке шириной 312px съедает углы фото. `--r-lg` только у полотна.
+
+**Тёмная карточка-сценарий** (nor.ma «presets»): `background:var(--dark); border-radius:28px; aspect-ratio:4/5; overflow:hidden`, фото на всю карточку, текст поверх снизу.
+
+**Серая панель-витрина** (nor.ma отзывы): `background:var(--soft); border-radius:32px; aspect-ratio:16/10`, внутри плавающие белые карточки.
+
+## 13.9. Цифры на тёмном (перекрывает 4.11 `.oh` и 9.2)
+
+nor.ma кладёт цифры не на голый `#111`, а **стеклянными плитками поверх фото**:
+
+```css
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:480px}
+.stat-t{padding:24px;border-radius:16px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);backdrop-filter:blur(12px)}
+.stat-t b{display:block;font:600 clamp(1.875rem,1.1rem + 2.1vw,2.75rem)/1 var(--sf);letter-spacing:-0.04em;color:#fff;font-variant-numeric:tabular-nums}
+.stat-t span{display:block;margin-top:16px;font:500 15px/1.375 var(--sf);color:#fff}
+.stat-t small{display:block;font-size:13px;line-height:1.375;color:rgba(255,255,255,.6)}
+```
+
+Чётность соблюдена: 4 плитки 2x2. Тёмное полотно с фото `min-height:84vh`, заголовок слева, плитки справа.
+
+## 13.10. Таблица сравнения (перекрывает 4.10)
+
+```css
+.tw{margin-top:48px;overflow:hidden;border:1px solid var(--line);border-radius:16px;background:#fff}
+table{width:100%;border-collapse:separate;border-spacing:0;text-align:left}
+thead th{padding:24px 16px;background:var(--soft);font:700 16px/1.5 var(--sf);text-align:center;vertical-align:middle}
+thead th:first-child{width:30%;padding:24px 20px;text-align:left}
+tbody th{padding:16px 20px;border-top:1px solid var(--line);font:500 15px/1.5 var(--sf);text-align:left}
+tbody td{padding:16px;border-top:1px solid var(--line);text-align:center}
+.us{background:var(--dark);color:#fff}            /* наша колонка целиком тёмная */
+tbody .us{border-top-color:var(--line-inv)}
+```
+
+Значения в ячейках - иконки «есть / нет», а не текст. Шапка без капса.
+
+**Таблица влезает в контейнер, а не выходит за него (25.11.2026, правка Макса).** На компьютере таблица целиком помещается в ширину текста (976px при контейнере 1040) без горизонтальной прокрутки и без выноса шире контейнера. Если колонок много, уменьшается кегль и отступы ячеек, ширина блока не растёт:
+
+| Колонок | Кегль ячеек и шапки | Отступы ячеек | Пояснения внутри ячейки |
+|---|---|---|---|
+| до 5 | 16px шапка / 15px ячейки | как выше | как есть |
+| 6-7 | 14px | `14px 10px` | переносятся |
+| 8 и больше | 13px, `line-height:1.35` | `12px 8px` | 11.5px, переносятся |
+
+```css
+.tw:has(thead th:nth-child(6)) :is(th,td){font-size:14px;padding:14px 10px;line-height:1.4}
+.tw:has(thead th:nth-child(6)) thead th:first-child{width:auto}
+.tw:has(thead th:nth-child(6)) td :is(small,span,em,i){white-space:normal}
+.tw:has(thead th:nth-child(8)) :is(th,td){font-size:13px;padding:12px 8px;line-height:1.35}
+.tw:has(thead th:nth-child(8)) :is(th,td) :is(small,span,em,i){font-size:11.5px}
+```
+
+`white-space:nowrap` держит только само число (`td.n`), пояснение под ним переносится, иначе одна подпись раздувает колонку до 200+px. Проверка: `scrollWidth` обёртки `.tw` равен `clientWidth` на 1440, 1041 и 900. Ниже `min-width:780px` таблица листается внутри обёртки (телефон), страница по-прежнему не скроллится. Кегль ниже 13px в ячейках и 11.5px в пояснениях не опускать: если и так не влезает, резать колонки или делить таблицу на две.
+
+## 13.11. FAQ
+
+```css
+.faq{margin-top:48px;overflow:hidden;border:1px solid var(--line);border-radius:16px}
+.faq-q{display:flex;width:100%;align-items:center;justify-content:space-between;gap:24px;padding:20px 32px;font:500 17px/1.5 var(--sf);text-align:left}
+.faq-i + .faq-i{border-top:1px solid var(--line)}
+```
+
+## 13.12. Финальный CTA и футер (перекрывает 4.17)
+
+- **Финал:** полноэкранная секция `height:100vh` с видео или фото, снизу белый градиент `30vh`, по центру внизу `h2` + одна кнопка `.btn-dark` 48px, отступ снизу `56px`.
+- **Цены:** отдельное полотно `min-height:70vh; border-radius:var(--r-lg)` с фото и текстом поверх.
+- **Футер у nor.ma белый:** `padding:80px 0`, слева абзац о продукте `15px` `var(--ink2)` и малая чёрная кнопка `36px`, справа сетка `grid-template-columns:repeat(4,1fr); gap:40px 32px` (мобильный 2 колонки). Заголовок колонки `13px/600 var(--ink)`, ссылки `14px var(--ink2)`, hover `var(--ink)`.
+
+## 13.13. Движение (перекрывает 6.1, 6.4, 6.5)
+
+Появление у nor.ma мягче нашего и **с размытием**:
+
+```css
+.js .rv{opacity:0;filter:blur(10px);transform:translateY(12px);transition:opacity .7s var(--ease),filter .7s var(--ease),transform .7s var(--ease)}
+.js .rv.in{opacity:1;filter:none;transform:none}
+@media(prefers-reduced-motion:reduce){.js .rv{opacity:1;filter:none;transform:none;transition:none}}
+```
+
+| Что | Было (moloko) | Стало (nor.ma) |
+|---|---|---|
+| сдвиг | `translateY(30px)` | `translateY(12px)` |
+| размытие | нет | `blur(10px)` -> `0` |
+| длительность | `.8s` | `.7s` |
+| кривая | `cubic-bezier(.16,1,.3,1)` | `cubic-bezier(.22,1,.36,1)` |
+| отклики UI | `ease .15s` | `.15s cubic-bezier(.4,0,.2,1)` |
+| hover фото в карточке | нет | `scale(1.04)` за `.6s` |
+| hover кнопки | смена цвета | цвет `/.9` + `scale(.99)` на нажатие + стрелка `+4px` |
+| hover рамки | нет | `border-color` до `rgba(10,10,10,.2-.4)` |
+
+Лесенку задержек `.rv-d1..d3` по 80 мс оставляем.
+
+## 13.14. Мелочь, которую стоит взять
+
+- **Точки карусели:** `height:6px`, неактивная `6px` `rgba(255,255,255,.45)`, активная `24px` с белой заливкой-прогрессом, `transition:all .3s var(--ease)`.
+- **Подсказка за курсором** над рядом логотипов: чёрная пилюля `13px`, `padding:6px 12px`, `box-shadow:0 10px 30px -10px rgba(0,0,0,.5)`, только на `min-width:1024px`.
+- **Рейтинг:** `5.0` `16px/600 var(--ink)` + `(32)` `14px var(--ink3)`.
+- **Цифры** везде с `font-variant-numeric:tabular-nums` (класс `.num`).
+- **`scroll-margin-top:96px`** у секций с якорями, чтобы фиксированная шапка не закрывала заголовок (закрывает пробел из 3.7).
+
+## 13.15. Мобильный (дополняет часть 7), замер на 375px
+
+| Что | Значение |
+|---|---|
+| отступ полотна от края | `12px` |
+| поля контента | `24px` |
+| h1 / h2 / h3 | `32px` / `24px` / `18px` (те же clamp) |
+| радиус полотна | наш `40px` (nor.ma держит 28) |
+| шапка | лого-пилюля + кнопка меню `40x40` |
+| сетки | все в одну колонку, плитки цифр остаются 2x2 |
+
+---
+
+# ЧАСТЬ 14. ДОПОЛНЕНИЯ МАКСА (27.11.2026) - ДЕЙСТВУЮЩИЙ СТАНДАРТ
+
+Правила, которые Макс дал по ходу работы над страницами и приложениями NORMA (26-27.11.2026 и раньше). Проверены на живой странице. **При расхождении часть 14 перекрывает части 1-13.** CSS ниже взят из работающей страницы, классы совпадают с эталоном.
+
+## 14.1. Процесс
+
+- Делать только то, что попросили. Заметил проблему по пути - сказать, а не чинить молча. Дизайн, размеры и цвета без команды не менять.
+- Многосоставную просьбу разбить на пункты и закрыть каждый. Правка дизайн-кода сразу идёт во все страницы, где действует, и в этот документ.
+- Любую правку вносить во все языковые версии сразу (14.4).
+- Перед сдачей: замер DOM на 1440 и 375 px, скриншот, консоль без ошибок, горизонтальной прокрутки нет. Скриншот в эмуляции бывает устаревшим, доверять замеру `getBoundingClientRect`.
+
+## 14.2. Тексты
+
+- **Никаких ИИ-лозунгов.** Фразы-плакаты («Сначала договоры, потом кран», «Твой карри. Горячая еда среди соков и сладкого») запрещены. Каждый текст прогонять через stop-slop: факт, цифра, имя, действие.
+  - Было: «Твой карри. Горячая еда среди соков и сладкого.» Стало: «Веганское карри с рисом по нашим рецептам.»
+  - Было: «Новые гости для всех лавок». Стало: «Гости ярмарки покупают и в лавках».
+- **Без преувеличений.** «Все, кто едет из Убуда в Чангу» → «Дорога из Убуда в Чангу». Утверждение должно быть проверяемым.
+- **Без «беллетристики».** Текстовый блок живёт только в паре «фото + текст» (`.mod2`). Абзацы-эссе на всю ширину не ставить.
+- **Плита под hero и подписи блоков - факты, не слоганы** (14.5).
+- **Один смысл на строке.** Число с единицей («$10 000+», «24/7», «10 лет») не рвать переносом: неразрывный пробел `&nbsp;` или `white-space:nowrap`. Выделенная мысль начинается с новой строки, а не висит хвостом.
+- **Заголовок раздела = пункт меню.** Короткое слово («Концепт», «Лавки», «Партнёры», «Модель», «Смета», «Запуск»), подпись под ним не длиннее двух строк на всю ширину контейнера: `.sub{max-width:none}`.
+- **Предупреждения только по факту.** Текст-предупреждение показывается, когда условие сработало (порог превышен), а не висит постоянно. Пустые инструкции «как пользоваться» и тексты-пояснения к очевидному удалять.
+- **Риски - один короткий блок в конце страницы**, 4-5 строк по одной мысли, без драмы. По странице риски не разбрасывать.
+- Перевод по смыслу, не калькой: блок примеров = «Proof of Concept», а не «Examples»; концепт = «Our Concept».
+
+## 14.3. Шапка
+
+### Шапка по колонкам hero
+
+Если первый экран собран из нескольких фото (14.5), шапка повторяет их сетку: логотип стоит по центру левой колонки, действия по центру правой. Так и после прокрутки.
+
+```css
+.hero-nav{left:16px;right:16px;width:auto!important;max-width:none!important;transform:none;padding:0!important;
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));column-gap:2px;align-items:center}
+.hero-nav .logo{grid-column:1;justify-self:center}
+.hero-nav .nav-actions{grid-column:-2;justify-self:center;margin-left:0}
+@media(max-width:760px){.hero-nav{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:640px){.hero-nav{left:12px;right:12px}}
+.hero-nav .logo,.hero-nav .cta{white-space:nowrap}   /* логотип из двух слов не переносится */
+```
+
+### Кнопка действия
+
+- Высота 40px, `14px/500`, пилюля. Текст = куда ведёт, со стрелкой: «Смета →» / «Financials →». Не «Считать», не «Подробнее».
+- Меню из 7 пунктов между логотипом и кнопкой помещается только от 1280px: на 901-1279px бургер.
+- Зона нажатия круглых кнопок шапки не меньше 42x44px при видимых 38-40px: `::after{content:'';position:absolute;inset:-3px -2px}`.
+
+### Переключатель языка
+
+Переключатель `RU EN` и кнопка срастаются в одну пилюлю: кнопка наезжает на переключатель.
+
+```css
+.lang{display:inline-flex;align-items:center;height:40px;padding:0 36px 0 6px;border-radius:999px 0 0 999px;corner-shape:round;
+  background:rgba(255,255,255,.44);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.lang a{padding:6px 7px;font:500 13px/1 var(--sf);color:#fff;opacity:.72;letter-spacing:.02em}
+.lang a.on{opacity:1;font-weight:700}
+.hero-nav .lang+.cta{margin-left:-36px;position:relative}
+.hero-nav.scrolled .lang{background:rgba(255,255,255,.8);border:1px solid var(--line);border-right:none}
+.hero-nav.scrolled .lang a{color:var(--ink2);opacity:1}
+.hero-nav.scrolled .lang a.on{color:var(--ink)}
+.lang-m{display:none!important}   /* «English» / «Русский» внутри мобильного меню */
+@media(max-width:760px){.hero-nav .lang{display:none}.hero-nav .lang+.cta{margin-left:0}
+  .hero-nav .links.mopen .lang-m{display:block!important}}
+```
+
+## 14.4. Языки
+
+- **Каждая правка сразу во всех языковых версиях.** Один источник: разметка на язык (`body.html`, `body.en.html`) и один скрипт, строки скрипта переводит словарь. Сборка падает, если у русской строки нет перевода, и если в английском скрипте осталась кириллица. Ведущие и хвостовые пробелы ключа и перевода совпадают.
+- `<link rel="alternate" hreflang>` на каждую версию.
+- **Заставка выбора языка при первом входе: только две кнопки с названиями языков** («Русский», «English»). Без логотипа, без вопроса «Выберите язык». Выбор хранится в `localStorage`; дальше заставки нет, а страница на другом языке сразу открывает выбранную версию. Без JS заставка не показывается.
+
+```css
+.splash{display:none}
+html.js:not(.lang-set) .splash{position:fixed;inset:0;z-index:1000;display:grid;place-items:center;padding:24px;
+  background:rgba(17,17,17,.6);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
+html.js:not(.lang-set) body{overflow:hidden}
+.splash-btns{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.splash-btns a{display:inline-flex;align-items:center;justify-content:center;min-width:150px;height:48px;padding:0 28px;
+  border-radius:999px;corner-shape:round;background:#fff;color:#0a0a0a;font:600 16px/1 var(--sf);text-decoration:none}
+```
+
+```html
+<!-- первым в <head>: класс js, выбранный язык, редирект на свою версию -->
+<script>(function(){var d=document.documentElement;d.classList.add('js');try{var l=localStorage.getItem('lang');
+if(l){d.classList.add('lang-set');if(l!==d.lang)location.replace((l==='en'?'/page/en/':'/page/')+location.hash)}}catch(e){}})()</script>
+```
+
+## 14.5. Первый экран и плита
+
+- **h1 на hero целиком белый.** Полупрозрачную первую строку не делать: `.hero-line h1{color:#fff}`.
+- **Hero из трёх фото равной ширины** от 761px (на телефоне два): `@media(min-width:761px){.hero .hero-img{grid-template-columns:repeat(3,minmax(0,1fr))}}`.
+- **Горизонтальное фото в узкой вертикальной колонке** обрезается по центру и теряет главный объект. Задать `object-position` на объект (роспись, окно, вывеска) и проверить скриншотом. Это касается и `.mod2 .m-photo`.
+- **Плита под hero белая, четыре факта в один ряд**, только факты (площадь, число лавок, доля, срок). Пустоту не оставлять.
+
+```css
+.slab{background:#fff}
+.slab-facts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px 28px;margin-top:36px}
+@media(max-width:900px){.slab-facts{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:480px){.slab-facts{grid-template-columns:minmax(0,1fr)}}
+```
+
+## 14.6. Секции и раскладка
+
+- **Карта - отдельная серая секция без заголовка**, в паре с текстом: карта в `.m-photo`, `iframe` на всю площадь (`position:absolute;inset:0;border:0`).
+- **Proof of concept / примеры - 4 лучшие карточки в один ряд**, не 6 в два ряда.
+- **Фото на странице не повторяются.** Если своих кадров не хватает и фото стоит дважды, сказать об этом и попросить кадр.
+- **Визуализацию (ИИ-рендер) подписывать** в строке источников фото: «Контейнер в разделе «Партнёры» это визуализация».
+- **Блоки не меняют размер** при переключении содержимого (табы, варианты, аккордеоны): `min-height` по самому высокому варианту, замер на десктопе и телефоне.
+- Две фотографии одна над другой в паре «фото + текст» и чертёж в текстовой карточке:
+
+```css
+.m-stack{position:relative}
+.mod2 .m-stack img{position:absolute;inset:auto 0;width:100%;height:calc(50% - 1px)}
+.mod2 .m-stack img:first-child{top:0}
+.mod2 .m-stack img:last-child{bottom:0}
+.m-plan{display:block;width:100%;max-width:300px;height:auto;margin:0 auto 18px}
+```
+
+## 14.7. Карточки-опоры: компактный вариант и логотип
+
+Пустота от верха карточки до фото не больше нужного: номер уходит в правый верхний угол на линию заголовка. На четырёх карточках это минус 31% высоты до фото (244 → 169px).
+
+```css
+.pil-tight .pillar{position:relative}
+.pil-tight .pil-n{position:absolute;top:18px;right:18px;margin:0}
+.pil-tight .pillar h3{font-size:19px;line-height:1.25;padding:20px 54px 0 20px}
+.pil-tight .pil-sub{font-size:14px;line-height:1.45;padding:6px 20px 16px}
+.pil-tight .pillar ul{padding-left:20px;padding-right:20px}
+/* логотип бренда вместо номера: крупнее кружка, справа от названия */
+.pil-tight .pil-logo{position:absolute;top:14px;right:14px;width:64px;height:auto}
+.pil-tight .pillar:has(.pil-logo) h3{padding-right:90px}
+```
+
+Проверка: заголовок не наезжает на номер или логотип (`Range.getClientRects()` строк заголовка против прямоугольника логотипа) на 1440 и 375px.
+
+## 14.8. Калькулятор и модель
+
+- **Второстепенная группа ползунков свёрнута** в одну итоговую цифру и стоит внизу; по клику раскрываются ползунки.
+
+```css
+.grp-fold>summary{display:flex;align-items:center;gap:12px;cursor:pointer;list-style:none}
+.grp-fold>summary::-webkit-details-marker{display:none}
+.grp-fold>summary::after{content:'';width:9px;height:9px;border-right:2px solid var(--ink2);border-bottom:2px solid var(--ink2);
+  transform:rotate(45deg);margin:-4px 4px 0 0;transition:transform .2s var(--ease-ui)}
+.grp-fold[open]>summary{margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--line)}
+.grp-fold[open]>summary::after{transform:rotate(-135deg);margin-top:4px}
+.grp-sum{margin-left:auto;text-align:right;font-size:20px;font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums}
+.sl-hint{display:block;font-style:normal;color:var(--ink-mute);font-size:12px;margin-top:2px}   /* откуда допущение */
+.sl-sum{display:block;font-size:12px;font-weight:500;color:var(--ink-mute);text-align:right;margin-top:2px}   /* сумма строки */
+```
+
+- **Модель честная.** Есть разгон после открытия (поток в месяцы 1-3 и 4-6), подушка на разгон в смете, возврат считается по накопленной прибыли месяц за месяцем. Прибыль подписана «на полном потоке». Числа на странице берутся из скрипта, в разметке их не хардкодить.
+- Одни и те же числа совпадают во всех местах страницы.
+
+## 14.9. Превью ссылки (OG)
+
+- `og:image` 1200x630, собирается из текущих фото hero. Сменили hero - пересобрать картинку **и сменить имя файла** (`og-cover-2.jpg`): Telegram и мессенджеры кэшируют превью по адресу картинки и страницы. Обновить превью в Telegram: отправить ссылку боту @WebpageBot или добавить к ссылке `?v=2`.
+- `og:title`, `og:description`, `og:url` на каждую языковую версию.
+
+## 14.10. Исправления канона (грабли, найдены 26.11.2026)
+
+```css
+/* мобильное меню: базовый translateX(-50%) уводит раскрытую панель на пол-экрана влево */
+@media(max-width:900px){.hero-nav .links.mopen{transform:none}}
+.hero-nav .links.mopen{height:auto}
+/* плитки показателей: длинное слово не раздвигает колонку; 4 в ряд только от 1280px при длинных суммах */
+.kpis{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media(max-width:1279px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:420px){.kpis{grid-template-columns:minmax(0,1fr)}}
+/* mod2: если текст выше фото, фото дотягивается до высоты текста */
+@media(min-width:821px){.mod2 .m-photo{height:auto;min-height:clamp(420px,42vw,560px);position:relative}
+  .mod2 .m-photo img{position:absolute;inset:0}}
+/* наезд полотен на глубину радиуса: плита под hero и финал под серой секцией */
+.slab{padding-top:calc(96px + var(--r-lg))!important}
+@media(max-width:640px){.slab{padding-top:calc(64px + var(--r-lg))!important}}
+```
+
+`.pil-sub` обрезается в четырёх узких колонках на 1001-1100px: высоту подписи не фиксировать, строки карточек выравнивает subgrid (13.8).
+
+## 14.11. NORMA в приложениях (по CrewHarness)
+
+Для веб-приложений и PWA, не для лендингов:
+
+- Таб-бар не больше 5 вкладок. Новое проактивное - карточкой решения или строкой журнала, детали по тапу.
+- Цели нажатия от 44px. Телефон 360-430px без горизонтальной прокрутки.
+- Статусы заливкой или обводкой. Красный и зелёный только для статусов.
+- У модулей приложения могут быть свои цветовые семейства. Коричневого и оливкового нет.
+- Без эмодзи. Тексты на всех языках продукта, сотрудник видит свой язык.
+- Одни и те же числа совпадают на всех экранах (тест на сходимость).
+- Блоки-панели в приложениях: радиус 20px + squircle, вложенные элементы 14px, пилюли 999px.
+
+## 14.12. Чек-лист к части 14 (добавить к части 10)
+
+1. Нет лозунгов и пустых подписей; тексты прошли stop-slop.
+2. Каждая правка есть во всех языковых версиях; сборка без пропущенных переводов.
+3. Шапка стоит по колонкам hero, кнопка 40px с названием раздела, язык сросся с кнопкой.
+4. Заставка языка: только две кнопки.
+5. Горизонтальные фото в узких колонках кадрированы на объект.
+6. Фото не повторяются, визуализации подписаны.
+7. Предупреждения появляются только по условию; риски одним блоком в конце.
+8. OG-картинка из текущего hero, имя файла новое после смены.
